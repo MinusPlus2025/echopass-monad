@@ -35,13 +35,14 @@ export function HostView({
   const unlock = async () => {
     setError('')
     try {
-      const [nextChallenge, nextCount] = await Promise.all([
-        fetchChallenge(token),
-        getClaimCount(),
-      ])
+      const nextChallenge = await fetchChallenge(token)
       setChallenge(nextChallenge)
-      setCount(nextCount)
       setToken('')
+      try {
+        setCount(await getClaimCount())
+      } catch {
+        setCount(null)
+      }
     } catch {
       setError('Unable to unlock Host')
     }
@@ -73,7 +74,7 @@ export function HostView({
           <button onClick={() => play(challenge.code)} type="button">
             Play sound
           </button>
-          <p>{count ?? 0} claims</p>
+          <p>{count === null ? 'Claim count unavailable' : `${count} claims`}</p>
         </div>
       )}
       {error && <p role="alert">{error}</p>}
