@@ -194,6 +194,7 @@ package.json valid
 Fix commit:
 
 - `1c440ce709662cac1a4774486c5ab604ad330705` — `fix: isolate EchoPass event rewards`
+- `9d0cb8c0f9384d795ece8f70dfd04c308e75654a` — `test: use Hardhat artifact API for ABI parity`
 
 ### Review findings addressed in source
 
