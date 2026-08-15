@@ -1,6 +1,9 @@
 # EchoPass — Official Monad Resource Decisions
 
-Source list: https://blitz.devnads.com/resources
+Monad Blitz resource entry point: https://monad-foundation.notion.site/01c6367594f2821ba050010d2dfcbc7f
+
+The Notion page is navigation only. Concrete network and deployment values below
+are sourced from the current official Monad documentation.
 
 ## Use now
 
@@ -8,9 +11,14 @@ Source list: https://blitz.devnads.com/resources
 
 - Chain ID: `10143`
 - Public RPC: `https://testnet-rpc.monad.xyz`
-- Explorer: `https://testnet.monadscan.com`
+- Primary explorer: `https://testnet.monadvision.com`
+- Secondary explorer: `https://testnet.monadscan.com`
 - Faucet: `https://faucet.monad.xyz`
 - Official network reference: https://docs.monad.xyz/developer-essentials/testnet
+
+The official public RPC currently reports `eth_chainId = 0x279f` (`10143`). The
+testnet was reset from genesis on 2025-12-16, so deployment addresses from before
+that reset must not be reused.
 
 ### Browser deployment fallback
 
@@ -39,7 +47,11 @@ Official Hardhat deploy guide: https://docs.monad.xyz/guides/deploy-smart-contra
 
 Official verification guide: https://docs.monad.xyz/guides/verify-smart-contract/hardhat
 
-After dependencies are available, verify on Sourcify/MonadVision and Monadscan. Source verification is a post-deployment requirement for judge confidence even though the submission rules only explicitly require a live Monad deployment.
+After deployment, use the repository's existing Hardhat 3 toolchain to verify on
+Sourcify/MonadVision and Monadscan. Confirm the result using both explorer links,
+because the official guide notes that the verification command can report an
+error even when explorer verification succeeded. Do not clone or copy the
+official Hardhat template.
 
 ## Reference only
 
