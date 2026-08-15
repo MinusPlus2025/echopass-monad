@@ -6,6 +6,27 @@ import { ClaimView } from '../src/views/ClaimView.js'
 import { publicConfig } from './fixtures.js'
 
 describe('Claim view', () => {
+  it('fills the challenge from microphone recognition and keeps fallback available', async () => {
+    const user = userEvent.setup()
+    render(
+      <ClaimView
+        config={publicConfig}
+        connect={vi.fn()}
+        createWriter={vi.fn()}
+        ethereum={{}}
+        issueVoucher={vi.fn()}
+        listen={vi.fn().mockResolvedValue('482913')}
+        submit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Listen for code' }))
+    expect(
+      screen.getByLabelText('识别备用方式 / Recognition fallback'),
+    ).toHaveValue('482913')
+    expect(screen.getByText('Code detected')).toBeInTheDocument()
+  })
+
   it('labels manual entry as fallback and completes the real claim client flow', async () => {
     const user = userEvent.setup()
     const connect = vi.fn().mockResolvedValue({

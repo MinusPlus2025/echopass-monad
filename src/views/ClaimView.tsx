@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Eip1193Provider } from 'ethers'
 
+import { listenForCode } from '../audio/listen.js'
 import type { PublicConfig } from '../config.js'
 import type { ClientVoucherResponse, Fetcher } from '../voucher/client.js'
 import type { ClaimWriter, ConnectedWallet } from '../wallet/client.js'
@@ -20,6 +21,7 @@ interface ClaimViewProps {
       eventId: string
     },
   ): Promise<ClientVoucherResponse>
+  listen?(): Promise<string>
   submit(
     writer: ClaimWriter,
     voucher: ClientVoucherResponse,
@@ -34,6 +36,16 @@ export function ClaimView(props: ClaimViewProps) {
   const [transactionUrl, setTransactionUrl] = useState('')
   const [status, setStatus] = useState('Ready')
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1_000))
+
+  const listen = async () => {
+    try {
+      setStatus('Listening for code')
+      setCode(await (props.listen ?? listenForCode)())
+      setStatus('Code detected')
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Recognition failed')
+    }
+  }
 
   useEffect(() => {
     if (!voucher) return
@@ -95,6 +107,9 @@ export function ClaimView(props: ClaimViewProps) {
     <section>
       <h1>Claim your EchoPass</h1>
       <p>Listen for the Host sound, then connect your wallet.</p>
+      <button onClick={listen} type="button">
+        Listen for code
+      </button>
       <label>
         识别备用方式 / Recognition fallback
         <input
