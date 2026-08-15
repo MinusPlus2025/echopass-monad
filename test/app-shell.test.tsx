@@ -24,4 +24,15 @@ describe('App shell', () => {
       screen.getByRole('heading', { name: 'Claim your EchoPass' }),
     ).toBeInTheDocument()
   })
+
+  it('provides a branded keyboard path to the main demo content', () => {
+    render(<App />)
+
+    expect(screen.getByRole('link', { name: 'Skip to demo' })).toHaveAttribute(
+      'href',
+      '#demo-content',
+    )
+    expect(screen.getByAltText('EchoPass')).toBeInTheDocument()
+    expect(screen.getByRole('main')).toHaveAttribute('id', 'demo-content')
+  })
 })

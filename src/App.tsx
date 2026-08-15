@@ -55,7 +55,18 @@ export function App() {
   }
 
   return (
-    <main>
+    <div className="app-shell">
+      <a className="skip-link" href="#demo-content">
+        Skip to demo
+      </a>
+      <header className="brand-bar">
+        <img alt="EchoPass" src="/assets/echopass-mark.svg" />
+        <div>
+          <span>耳听为实｜Ear Witness</span>
+          <strong>Hear the moment. Prove you were there.</strong>
+        </div>
+      </header>
+      <main id="demo-content">
       <nav aria-label="EchoPass demo views" role="tablist">
         {views.map((candidate) => (
           <button
@@ -98,6 +109,8 @@ export function App() {
           />
         )}
       </section>
-    </main>
+      </main>
+      <footer>Monad Testnet · Chain 10143</footer>
+    </div>
   )
 }
