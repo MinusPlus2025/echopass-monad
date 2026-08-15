@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import hre, { network } from 'hardhat'
+import { artifacts, network } from 'hardhat'
 
 import { echoPassAbi } from '../../src/contract/abi.js'
 import { signVoucher, type Voucher } from '../../src/domain/voucher.js'
@@ -586,7 +586,7 @@ describe('EchoPass', function () {
         .sort((left, right) =>
           JSON.stringify(left).localeCompare(JSON.stringify(right)),
         )
-    const artifact = await hre.artifacts.readArtifact('EchoPass')
+    const artifact = await artifacts.readArtifact('EchoPass')
 
     expect(normalize(echoPassAbi)).to.deep.equal(
       normalize(artifact.abi as AbiItem[]),
