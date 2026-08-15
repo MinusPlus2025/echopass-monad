@@ -6,12 +6,15 @@
   "scripts": {
     "test": "vitest run",
     "test:contract": "hardhat test mocha",
+    "deploy:monad": "hardhat run scripts/deploy.ts --network monadTestnet",
     "build": "tsc -b && vite build"
+  },
+  "dependencies": {
+    "ethers": "^6.17.0"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox-mocha-ethers": "^3.0.7",
     "@types/node": "^22.0.0",
-    "ethers": "^6.17.0",
     "hardhat": "^3.12.0",
     "typescript": "^5.0.0",
     "vite": "^7.0.0",

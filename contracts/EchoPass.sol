@@ -8,6 +8,7 @@ contract EchoPass {
     struct EventDetails {
         uint64 endsAt;
         uint96 reward;
+        uint256 remainingBudget;
         bool exists;
     }
 
@@ -22,6 +23,11 @@ contract EchoPass {
         bytes32 indexed eventId,
         address indexed claimant,
         uint256 reward
+    );
+    event EventFundsWithdrawn(
+        bytes32 indexed eventId,
+        address indexed recipient,
+        uint256 amount
     );
 
     constructor(address signer) {
@@ -44,6 +50,7 @@ contract EchoPass {
         _events[eventId] = EventDetails({
             endsAt: endsAt,
             reward: reward,
+            remainingBudget: msg.value,
             exists: true
         });
     }
@@ -54,7 +61,7 @@ contract EchoPass {
         bytes32 signalHash,
         bytes calldata signature
     ) external {
-        EventDetails memory details = _events[eventId];
+        EventDetails storage details = _events[eventId];
         require(details.exists, "event not found");
         require(block.timestamp <= details.endsAt, "event ended");
         require(block.timestamp <= validUntil, "voucher expired");
@@ -72,9 +79,14 @@ contract EchoPass {
         );
         require(_recover(digest, signature) == voucherSigner, "invalid voucher");
 
-        _claims[eventId][msg.sender] = true;
-
         uint256 reward = uint256(details.reward);
+        require(
+            details.remainingBudget >= reward,
+            "event reward exhausted"
+        );
+        _claims[eventId][msg.sender] = true;
+        details.remainingBudget -= reward;
+
         if (reward != 0) {
             (bool sent, ) = payable(msg.sender).call{value: reward}("");
             require(sent, "reward transfer failed");
@@ -83,14 +95,36 @@ contract EchoPass {
         emit PresenceClaimed(eventId, msg.sender, reward);
     }
 
+    function withdrawEventFunds(
+        bytes32 eventId,
+        address payable recipient
+    ) external {
+        require(msg.sender == organizer, "only organizer");
+        EventDetails storage details = _events[eventId];
+        require(details.exists, "event not found");
+        require(block.timestamp > details.endsAt, "event active");
+        require(recipient != address(0), "invalid recipient");
+
+        uint256 amount = details.remainingBudget;
+        require(amount != 0, "no event funds");
+        details.remainingBudget = 0;
+
+        (bool sent, ) = recipient.call{value: amount}("");
+        require(sent, "withdrawal failed");
+
+        emit EventFundsWithdrawn(eventId, recipient, amount);
+    }
+
+    function eventBalance(bytes32 eventId) external view returns (uint256) {
+        return _events[eventId].remainingBudget;
+    }
+
     function hasClaimed(
         bytes32 eventId,
         address claimant
     ) external view returns (bool) {
         return _claims[eventId][claimant];
     }
-
-    receive() external payable {}
 
     function _recover(
         bytes32 digest,
