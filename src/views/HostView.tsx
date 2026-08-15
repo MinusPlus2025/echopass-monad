@@ -22,6 +22,7 @@ export function HostView({
   play,
 }: HostViewProps) {
   const [token, setToken] = useState('')
+  const [hostToken, setHostToken] = useState('')
   const [challenge, setChallenge] = useState<Challenge | null>(null)
   const [count, setCount] = useState<number | null>(null)
   const [error, setError] = useState('')
@@ -59,11 +60,26 @@ export function HostView({
     return () => window.clearInterval(timer)
   }, [challenge])
 
+  useEffect(() => {
+    if (!challenge || !hostToken) return
+    const delay = Math.max(0, challenge.expiresAt - Date.now())
+    const timer = window.setTimeout(async () => {
+      try {
+        setChallenge(await fetchChallenge(hostToken))
+        setNow(Date.now())
+      } catch {
+        setError('Unable to refresh Host code')
+      }
+    }, delay)
+    return () => window.clearTimeout(timer)
+  }, [challenge, fetchChallenge, hostToken])
+
   const unlock = async () => {
     setError('')
     try {
       const nextChallenge = await fetchChallenge(token)
       setChallenge(nextChallenge)
+      setHostToken(token)
       setToken('')
       try {
         setCount(await getClaimCount())
