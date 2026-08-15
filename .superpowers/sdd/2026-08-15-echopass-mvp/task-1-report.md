@@ -48,7 +48,7 @@ Full test suite: `CI=1 npm test` — 1 test passed.
 ## Files changed
 
 - `package.json` and `package-lock.json`: Vite, TypeScript, and Vitest baseline scripts/dependencies.
-- `tsconfig.json`, `vite.config.ts`, and `index.html`: TypeScript/Vite baseline configuration.
+- `.gitignore`, `tsconfig.json`, `vite.config.ts`, and `index.html`: TypeScript/Vite baseline configuration and generated-file ignores.
 - `test/code.test.ts`: rotating-code behavior test.
 - `src/domain/code.ts`: 30-second slot calculation, SHA-256-derived six-digit code generation, and current/previous slot acceptance.
 - `.superpowers/sdd/2026-08-15-echopass-mvp/task-1-report.md`: this report.
