@@ -85,6 +85,8 @@ Core buyer value: less manual check-in, lower static-code sharing, auditable spo
 
 ## Submission checklist
 
+Local acceptance evidence before deployment: 43 Vitest tests, 20 Hardhat contract tests, and the Vite production build pass. Public URLs below remain unchecked until they have been observed on the deployed system.
+
 - [ ] MOJO login works now.
 - [ ] Team is created/joined before the submission phase.
 - [ ] Team leader is identified and responsible for final submission.
