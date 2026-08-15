@@ -8,7 +8,10 @@ class CodeAccumulator {
   private code = ''
   private readyForDigit = true
 
-  constructor(private readonly stableFrames: number) {}
+  constructor(
+    private readonly stableFrames: number,
+    private readonly onDigit?: (code: string) => void,
+  ) {}
 
   push(peaks: number[]): string | null {
     const digit = detectDigit(peaks)
@@ -29,6 +32,7 @@ class CodeAccumulator {
     if (this.candidateFrames < this.stableFrames) return null
 
     this.code += digit
+    this.onDigit?.(this.code)
     this.readyForDigit = false
     return this.code.length === 6 ? this.code : null
   }
@@ -46,7 +50,15 @@ export function recognizeCodeFromPeaks(
   throw new Error('No complete six-digit code detected')
 }
 
-export async function listenForCode(timeoutMs = 12_000): Promise<string> {
+export interface ListenOptions {
+  onDigit?(code: string): void
+  onLevel?(level: number): void
+}
+
+export async function listenForCode(
+  timeoutMs = 12_000,
+  options: ListenOptions = {},
+): Promise<string> {
   if (!navigator.mediaDevices?.getUserMedia || !globalThis.AudioContext) {
     throw new Error('Microphone recognition is unavailable')
   }
@@ -58,12 +70,14 @@ export async function listenForCode(timeoutMs = 12_000): Promise<string> {
   analyser.fftSize = 4_096
   source.connect(analyser)
   const levels = new Float32Array(analyser.frequencyBinCount)
-  const accumulator = new CodeAccumulator(3)
+  const accumulator = new CodeAccumulator(3, options.onDigit)
   const startedAt = Date.now()
 
   try {
     while (Date.now() - startedAt < timeoutMs) {
       analyser.getFloatFrequencyData(levels)
+      const strongest = Math.max(...levels)
+      options.onLevel?.(Math.max(0, Math.min(1, (strongest + 90) / 55)))
       const peaks = DTMF_FREQUENCIES.filter((frequency) => {
         const bin = Math.round((frequency * analyser.fftSize) / context.sampleRate)
         return levels[bin] > -45

@@ -36,11 +36,17 @@ export function ClaimView(props: ClaimViewProps) {
   const [transactionUrl, setTransactionUrl] = useState('')
   const [status, setStatus] = useState('Ready')
   const [now, setNow] = useState(() => Math.floor(Date.now() / 1_000))
+  const [level, setLevel] = useState(0)
+  const [detectedCode, setDetectedCode] = useState('')
 
   const listen = async () => {
     try {
       setStatus('Listening for code')
-      setCode(await (props.listen ?? listenForCode)())
+      const detected = props.listen
+        ? await props.listen()
+        : await listenForCode(12_000, { onDigit: setDetectedCode, onLevel: setLevel })
+      setDetectedCode(detected)
+      setCode(detected)
       setStatus('Code detected')
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Recognition failed')
@@ -110,6 +116,13 @@ export function ClaimView(props: ClaimViewProps) {
       <button onClick={listen} type="button">
         Listen for code
       </button>
+      <div className="listener-stage" aria-label="Detected sound code" style={{ '--level': level } as React.CSSProperties}>
+        <div className="live-wave" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /></div>
+        <div className="detected-slots">
+          {Array.from({ length: 6 }, (_, index) => <b className={detectedCode[index] ? 'is-filled' : ''} data-testid="detected-digit" key={index}>{detectedCode[index] ?? '·'}</b>)}
+        </div>
+        <small>{status === 'Listening for code' ? 'Listening · analysing dual tones' : 'Six tones become one presence code'}</small>
+      </div>
       <label>
         识别备用方式 / Recognition fallback
         <input

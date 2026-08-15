@@ -28,7 +28,10 @@ describe('Host view', () => {
     expect(await screen.findByText('482913')).toBeInTheDocument()
     expect(screen.getByText('7 claims')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Play sound' }))
-    expect(play).toHaveBeenCalledWith('482913')
+    expect(play).toHaveBeenCalledWith('482913', expect.any(Object))
+    expect(screen.getByLabelText('Sound code visualization')).toBeInTheDocument()
+    expect(screen.getAllByTestId('sound-digit')).toHaveLength(6)
+    expect(screen.getByRole('button', { name: 'Stop playback' })).toBeInTheDocument()
     expect(challenge).toHaveBeenCalledWith('host-token')
   })
 

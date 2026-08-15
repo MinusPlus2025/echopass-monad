@@ -25,6 +25,10 @@ describe('Claim view', () => {
       screen.getByLabelText('识别备用方式 / Recognition fallback'),
     ).toHaveValue('482913')
     expect(screen.getByText('Code detected')).toBeInTheDocument()
+    expect(screen.getByLabelText('Detected sound code')).toBeInTheDocument()
+    expect(screen.getAllByTestId('detected-digit').map((slot) => slot.textContent)).toEqual([
+      '4', '8', '2', '9', '1', '3',
+    ])
   })
 
   it('labels manual entry as fallback and completes the real claim client flow', async () => {

@@ -86,4 +86,24 @@ describe('audible code transport', () => {
       'Code must be six decimal digits',
     )
   })
+
+  it('reports the exact digit and frequency pair used by playback', async () => {
+    const steps: Array<[number, string, number, number]> = []
+    const context = {
+      currentTime: 0,
+      destination: {},
+      createOscillator: () => ({
+        frequency: { value: 0 }, type: '', connect() {}, disconnect() {}, start() {}, stop() {},
+      }),
+    } as unknown as AudioContext
+
+    await playCode('482913', context, {
+      onDigit: (index, digit, frequencies) => steps.push([index, digit, ...frequencies]),
+    })
+
+    expect(steps).toEqual([
+      [0, '4', 770, 1209], [1, '8', 852, 1336], [2, '2', 697, 1336],
+      [3, '9', 852, 1477], [4, '1', 697, 1209], [5, '3', 697, 1477],
+    ])
+  })
 })

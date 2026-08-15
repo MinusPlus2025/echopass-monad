@@ -15,6 +15,11 @@ const PEAK_TOLERANCE_HZ = 25
 const DIGIT_DURATION_SECONDS = 0.2
 const DIGIT_GAP_SECONDS = 0.05
 
+export interface PlaybackOptions {
+  signal?: AbortSignal
+  onDigit?(index: number, digit: string, frequencies: [number, number]): void
+}
+
 export function frequenciesForDigit(digit: string): [number, number] {
   const frequencies = DTMF[digit]
   if (!frequencies) {
@@ -44,6 +49,7 @@ export function detectDigit(peaks: number[]): string | null {
 export async function playCode(
   code: string,
   context?: AudioContext,
+  options: PlaybackOptions = {},
 ): Promise<void> {
   if (!/^\d{6}$/.test(code)) {
     throw new Error('Code must be six decimal digits')
@@ -59,11 +65,22 @@ export async function playCode(
 
   let startAt = audioContext.currentTime
 
-  for (const digit of code) {
+  const oscillators: OscillatorNode[] = []
+  options.signal?.addEventListener('abort', () => {
+    for (const oscillator of oscillators) {
+      try { oscillator.stop() } catch { /* already stopped */ }
+      oscillator.disconnect()
+    }
+  }, { once: true })
+
+  for (const [index, digit] of [...code].entries()) {
+    if (options.signal?.aborted) break
     const [lowFrequency, highFrequency] = frequenciesForDigit(digit)
     const lowOscillator = audioContext.createOscillator()
     const highOscillator = audioContext.createOscillator()
     const endAt = startAt + DIGIT_DURATION_SECONDS
+    oscillators.push(lowOscillator, highOscillator)
+    options.onDigit?.(index, digit, [lowFrequency, highFrequency])
 
     lowOscillator.type = 'sine'
     highOscillator.type = 'sine'

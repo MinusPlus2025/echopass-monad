@@ -91,7 +91,7 @@ export function App() {
             config={config}
             fetchChallenge={fetchChallenge}
             getClaimCount={() => claimCount(config, config.eventId)}
-            play={playCode}
+            play={(code, options) => playCode(code, undefined, options)}
           />
         ) : view === 'claim' ? (
           <ClaimView
