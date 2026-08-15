@@ -10,7 +10,7 @@
     "jsx": "react-jsx",
     "noEmit": true,
     "lib": ["ES2022", "DOM"],
-    "types": ["node"]
+    "types": ["node", "vite/client"]
   },
   "include": ["api", "src", "test", "vite.config.ts"]
 }

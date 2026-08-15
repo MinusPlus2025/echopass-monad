@@ -1,5 +1,18 @@
 import { useState } from 'react'
 
+import { playCode } from './audio/tone.js'
+import { loadPublicConfig } from './config.js'
+import { claimCount, hasClaimed } from './contract/client.js'
+import { requestVoucher } from './voucher/client.js'
+import { ClaimView } from './views/ClaimView.js'
+import { HostView } from './views/HostView.js'
+import { VerifyView } from './views/VerifyView.js'
+import {
+  connectMonadWallet,
+  createClaimWriter,
+  submitClaim,
+} from './wallet/client.js'
+
 type View = 'host' | 'claim' | 'verify'
 
 const views: Array<{ id: View; label: string; heading: string }> = [
@@ -7,6 +20,17 @@ const views: Array<{ id: View; label: string; heading: string }> = [
   { id: 'claim', label: 'Claim', heading: 'Claim your EchoPass' },
   { id: 'verify', label: 'Verify', heading: 'Verify an EchoPass' },
 ]
+
+async function fetchChallenge(token: string) {
+  const response = await fetch('/api/challenge', {
+    headers: { 'x-host-token': token },
+  })
+  const data = (await response.json()) as Record<string, unknown>
+  if (!response.ok || typeof data.code !== 'string' || typeof data.expiresAt !== 'number') {
+    throw new Error('challenge_failed')
+  }
+  return { code: data.code, expiresAt: data.expiresAt }
+}
 
 function viewFromLocation(): View {
   const value = new URLSearchParams(window.location.search).get('view')
@@ -16,6 +40,12 @@ function viewFromLocation(): View {
 export function App() {
   const [view, setView] = useState<View>(viewFromLocation)
   const selected = views.find((candidate) => candidate.id === view) ?? views[0]
+  let config
+  try {
+    config = loadPublicConfig(import.meta.env)
+  } catch {
+    config = null
+  }
 
   const selectView = (nextView: View) => {
     const url = new URL(window.location.href)
@@ -39,8 +69,34 @@ export function App() {
           </button>
         ))}
       </nav>
-      <section aria-labelledby={`${selected.id}-heading`} role="tabpanel">
-        <h1 id={`${selected.id}-heading`}>{selected.heading}</h1>
+      <section aria-label={selected.heading} role="tabpanel">
+        {!config ? (
+          <div>
+            <h1>{selected.heading}</h1>
+            <p role="alert">EchoPass deployment is not configured.</p>
+          </div>
+        ) : view === 'host' ? (
+          <HostView
+            config={config}
+            fetchChallenge={fetchChallenge}
+            getClaimCount={() => claimCount(config, config.eventId)}
+            play={playCode}
+          />
+        ) : view === 'claim' ? (
+          <ClaimView
+            config={config}
+            connect={connectMonadWallet}
+            createWriter={createClaimWriter}
+            ethereum={(window as unknown as { ethereum?: unknown }).ethereum}
+            issueVoucher={requestVoucher}
+            submit={submitClaim}
+          />
+        ) : (
+          <VerifyView
+            config={config}
+            verify={(eventId, wallet) => hasClaimed(config, eventId, wallet)}
+          />
+        )}
       </section>
     </main>
   )
