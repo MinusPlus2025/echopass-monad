@@ -79,6 +79,7 @@ strong { overflow-wrap: anywhere; }
 [role="tabpanel"] section > div > strong { color: #a8f6dd; font-size: clamp(3rem, 14vw, 7rem); letter-spacing: .12em; }
 
 label { display: grid; gap: 8px; color: #dfe2ef; font-weight: 700; }
+label + button:not([role="tab"]) { margin-top: 18px; }
 input {
   width: 100%;
   padding: 13px 14px;
