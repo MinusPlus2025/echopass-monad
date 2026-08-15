@@ -363,6 +363,7 @@ describe('EchoPass', function () {
           signature,
         ),
     ).to.changeEtherBalances(
+      ethers,
       [fixture.contract, fixture.attendee],
       [-reward, reward],
     )
@@ -515,6 +516,7 @@ describe('EchoPass', function () {
         fixture.organizer.address,
       ),
     ).to.changeEtherBalances(
+      ethers,
       [fixture.contract, fixture.organizer],
       [-(reward * 2n), reward * 2n],
     )
