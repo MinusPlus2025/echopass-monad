@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">EchoPass</title>
+  <desc id="desc">Three violet sound waves meet a yellow pass with a verified check.</desc>
+  <rect width="512" height="512" rx="112" fill="#0b0a10"/>
+  <g fill="none" stroke="#7c3cff" stroke-linecap="round" stroke-width="34">
+    <path d="M88 136c-70 67-70 173 0 240"/>
+    <path d="M146 174c-47 44-47 120 0 164"/>
+    <path d="M203 215c-21 20-21 62 0 82"/>
+  </g>
+  <path d="M224 171h151c20 0 37 17 37 37v96c0 20-17 37-37 37H224z" fill="#edff21" transform="rotate(-10 318 256)"/>
+  <circle cx="271" cy="256" r="67" fill="#0b0a10"/>
+  <path d="m238 258 23 24 47-53" fill="none" stroke="#edff21" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/>
+</svg>
