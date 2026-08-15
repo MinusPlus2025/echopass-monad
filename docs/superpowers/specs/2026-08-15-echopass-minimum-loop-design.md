@@ -15,7 +15,7 @@ There is no indexer, account abstraction, Para integration, x402, EIP-7702, admi
 
 The application is a React 19 SPA built by Vite and deployed with Vercel. Ethers 6 provides injected-wallet access, read-only Monad Testnet RPC access, contract calls, event queries, and transaction links. The application has three routes represented by URL query state so a refresh or copied demo link preserves the active Host, Claim, or Verify view without introducing a routing framework.
 
-The Vercel function at `api/voucher.ts` is the only signing boundary. Pure request validation and voucher issuance live in focused server modules under `api/lib/`, allowing Vitest to exercise real validation and signing without starting Vercel. The function reads secrets only when handling a request; no private value is exported, serialized, logged, embedded in Vite variables, or included in test snapshots.
+The Vercel function at `api/voucher.ts` is the only signing boundary. Pure request validation and voucher issuance live in focused server modules under `api/lib/`, allowing Vitest to exercise real validation and signing without starting Vercel. The function reads secrets only when handling a request; no private value is exported, serialized, logged, embedded in Vite variables, or included in test snapshots. A separate `api/challenge.ts` derives the Host code server-side and requires an independent `HOST_ACCESS_TOKEN`; the Host operator enters that token before the demo and it remains only in React memory. This keeps `EVENT_CODE_SECRET` out of browser assets without turning the current rotating code into an unauthenticated public API.
 
 Shared public configuration includes chain ID `10143`, RPC `https://testnet-rpc.monad.xyz`, explorer `https://testnet.monadscan.com`, deployed contract address, event ID, and event display name. Browser-exposed values use the `VITE_` prefix. Server allow-list values do not contain secrets. The disposable voucher signer private key is stored only as `VOUCHER_SIGNER_PRIVATE_KEY` in Vercel and local `.env`, both ignored by Git. `.env.example` contains names and safe public defaults only.
 
@@ -35,7 +35,7 @@ Rate limiting is an in-memory, per-IP sliding window suitable for the minimum se
 
 ## Host view
 
-Host displays the frozen event name, current six-digit code, seconds remaining in the 30-second slot, a prominent Play Sound button using the existing DTMF transport, live onchain claim count derived from `PresenceClaimed` logs, and the deployed contract address. If required public configuration is missing, Host shows a deployment-configuration error rather than simulated data.
+Host first accepts the private Host access token, then displays the frozen event name, current six-digit code returned by the protected challenge endpoint, seconds remaining in the 30-second slot, a prominent Play Sound button using the existing DTMF transport, live onchain claim count derived from `PresenceClaimed` logs, and the deployed contract address. The token is never persisted. If required public or server configuration is missing, Host shows a deployment-configuration error rather than simulated data.
 
 ## Claim view
 

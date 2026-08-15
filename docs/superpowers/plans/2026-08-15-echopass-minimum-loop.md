@@ -205,6 +205,7 @@ Run: `git add src/wallet/client.ts src/voucher/client.ts test/wallet-client.test
 **Interfaces:**
 - Consumes Tasks 2–4 clients and existing `deriveCode`, `playCode`.
 - Produces the complete real manual-fallback demo path before microphone work.
+- Host obtains its rotating code from the `HOST_ACCESS_TOKEN`-protected `/api/challenge` endpoint so `EVENT_CODE_SECRET` never enters browser assets; the access token remains in component memory only.
 
 - [ ] **Step 1: Write and run Host RED**
 
