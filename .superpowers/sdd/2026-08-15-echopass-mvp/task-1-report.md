@@ -63,4 +63,4 @@ Full test suite: `CI=1 npm test` — 1 test passed.
 
 ## Commit
 
-Commit: `033e0023d1b0982a5b66570140a690434cb11b55`
+Task 1 implementation commit: `379d682e590e0be97a5a7b34e6e3a9ac0e431054`
